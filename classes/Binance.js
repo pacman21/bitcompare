@@ -5,7 +5,32 @@ module.exports = class Binance{
 
     constructor(){
         this.data;
+        this.withdrawFees = {
+            "USDT": 28.5,
+            "ETH": 0.01,
+            "NEO": 0,
+            "XRP": 0.25,
+            "WAVES": 0.02,
+            "QTUM": 0.01,
+            "LTC": 0.01,
+            "EOS": 1,
+            "ZEC": 0.005,
+            "DASH": 0.002,
+            "ETC": 0.01,
+            "LSK": 0.1,
+            "XMR": 0.04,
+            "Wings": 10.1,
+            "KMD": 0.002,
+            "ICN": 4,
+            "MCO": 0.89,
+            "MTL": 2.6,
+            "RLC": 5.2,
+            "BCH": 0.001,
+            "BCC": 0.001,
+            "ADA": 1
+        };
     }
+
     async loadData(){
         if(typeof(this.data) == "undefined") {    
             const response = await fetch("https://api.binance.com/api/v1/ticker/allPrices");
@@ -16,13 +41,18 @@ module.exports = class Binance{
 
     getCoin(outCurrency, inCurrency = "USDT") {
         try {  
+            var tradeOutcurrency = outCurrency;
             if(outCurrency == "USDT"){
                 return 1;
             }     
 
+            if(outCurrency == "BCH"){
+                tradeOutcurrency = "BCC";
+            }
+
             //check if value exists in USDT
             var item = this.data.filter(function(item) {
-                return item.symbol == outCurrency.toUpperCase() + inCurrency;
+                return item.symbol == tradeOutcurrency.toUpperCase() + inCurrency;
             }); 
 
             if(item.length > 0){
@@ -38,7 +68,7 @@ module.exports = class Binance{
                 var etherPrice = etherItem[0].price;
 
                 var valueEth = this.data.filter(function(item) {
-                    return item.symbol == outCurrency.toUpperCase() + "ETH";
+                    return item.symbol == tradeOutcurrency.toUpperCase() + "ETH";
                 });
 
                 if(valueEth.length > 0){

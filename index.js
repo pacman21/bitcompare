@@ -2,8 +2,18 @@ const Currency = require('./classes/Currency.js');
 const Binance = require('./classes/Binance.js');
 const Exmo = require('./classes/Exmo.js');
 const LiveCoin = require('./classes/LiveCoin.js');
+const Gate = require('./classes/Gate.js');
+const Tidex = require('./classes/Tidex.js');
+const Yobit = require('./classes/Yobit.js');
+const Exx = require('./classes/Exx.js');
+const Bitflip = require('./classes/Bitflip.js');
 var fs = require('fs');
 var sleep = require('sleep');
+
+const cryptoList = ["XRP", "WAVES", "DASH", "RDN", "KMD", "BCH", "ETC", "LTC", "QTUM", "BCC", "XVG"];  
+//const cryptoList = ["XRP", "ZEC", "LTC", "DASH", "WAVES", "LSK", "KMD", "NEO", "EOS"];  
+//const cryptoList = ["XRP", "ZEC", "LTC", "DASH", "ETC", "WAVES", "LSK", "WINGS", "KMD", "EOS", "ICN", "MCO", "MTL"];  
+//const exchangeList = ["Exmo", "LiveCoin", "Exx", "Yobit", "Bitflip", "Gate"];
 
 var highestBuyDiff = [];
 var leastSellDiff = [];
@@ -12,6 +22,11 @@ var leastSellDiffCoin = [];
 var binance = new Binance();
 var exmo = new Exmo();
 var liveCoin = new LiveCoin();
+var tidex = new Tidex(cryptoList);
+var gate = new Gate();
+var yobit = new Yobit(cryptoList);
+var exx = new Exx();
+var bitflip = new Bitflip();
 
 function compare(coin){
     var binanceCurr = 1;
@@ -30,6 +45,16 @@ function compare(coin){
                 exchangeCoin = exmo.getCoin(coin);
             } else if(exchange == "LiveCoin") {
                 exchangeCoin = liveCoin.getCoin(coin);
+            } else if(exchange == "Tidex") {
+                exchangeCoin = tidex.getCoin(coin);
+            } else if(exchange == "Gate"){
+                exchangeCoin = gate.getCoin(coin);
+            } else if(exchange == "Yobit"){
+                exchangeCoin = yobit.getCoin(coin);
+            } else if(exchange == "Exx"){
+                exchangeCoin = exx.getCoin(coin);
+            } else if (exchange == "Bitflip"){
+                exchangeCoin = bitflip.getCoin(coin);
             }
 
             var bToE = (exchangeCoin.sellPrice - binanceCurr.sellPrice) /binanceCurr.sellPrice;
@@ -69,12 +94,37 @@ function estimateEarnings(startCoin, middleCoin, investment, exchange, minimalOu
             case "Exmo":
                 exchangeStartCoin = exmo.getCoin(startCoin);    
                 exchangeMiddleCoin = exmo.getCoin(middleCoin);
-                exchangeWithdrawFees = exmoWithdrawFees;
+                exchangeWithdrawFees = exmo.withdrawFees;
                 break;
             case "LiveCoin":
                 exchangeStartCoin = liveCoin.getCoin(startCoin);    
                 exchangeMiddleCoin = liveCoin.getCoin(middleCoin);
-                exchangeWithdrawFees = liveCoinWithdrawFees;
+                exchangeWithdrawFees = liveCoin.withdrawFees;
+                break;
+            case "Tidex":
+                exchangeStartCoin = tidex.getCoin(startCoin);    
+                exchangeMiddleCoin = tidex.getCoin(middleCoin);
+                exchangeWithdrawFees = tidex.withdrawFees;
+                break;
+            case "Gate":
+                exchangeStartCoin = gate.getCoin(startCoin);    
+                exchangeMiddleCoin = gate.getCoin(middleCoin);
+                exchangeWithdrawFees = gate.withdrawFees;
+                break;
+            case "Yobit":
+                exchangeStartCoin = yobit.getCoin(startCoin);    
+                exchangeMiddleCoin = yobit.getCoin(middleCoin);
+                exchangeWithdrawFees = yobit.withdrawFees;
+                break;
+            case "Exx":
+                exchangeStartCoin = exx.getCoin(startCoin);    
+                exchangeMiddleCoin = exx.getCoin(middleCoin);
+                exchangeWithdrawFees = exx.withdrawFees;
+                break;
+            case "Bitflip":
+                exchangeStartCoin = bitflip.getCoin(startCoin);    
+                exchangeMiddleCoin = bitflip.getCoin(middleCoin);
+                exchangeWithdrawFees = bitflip.withdrawFees;
                 break;
         }
 
@@ -82,7 +132,7 @@ function estimateEarnings(startCoin, middleCoin, investment, exchange, minimalOu
         var echangeMiddleCoinPrice = exchangeMiddleCoin.buyPrice;
         
         var buySC = (investment * 0.99) / binanceStartCoinPrice;
-        var receiveSC = buySC - binanceWithdrawFees[startCoin];
+        var receiveSC = buySC - binance.withdrawFees[startCoin];
         var sellSC = receiveSC * exchangeStartCoinPrice;
         var buyMC = sellSC / echangeMiddleCoinPrice;
         var receiveMC = buyMC - exchangeWithdrawFees[middleCoin];
@@ -93,7 +143,7 @@ function estimateEarnings(startCoin, middleCoin, investment, exchange, minimalOu
             console.log(`Start With: $${investment}`);
             console.log("\n\n---------------------");
             console.log(`Start Coin: ${startCoin} \nMiddle Coin: ${middleCoin}`);
-            console.log(`Start Coin fees: ${binanceWithdrawFees[startCoin]}${startCoin}`);
+            console.log(`Start Coin fees: ${binance.withdrawFees[startCoin]}${startCoin}`);
             console.log(`Middle Coin Fees: ${exchangeWithdrawFees[middleCoin]}${middleCoin}`);
             console.log("---------------------\n\n ");
             
@@ -115,16 +165,47 @@ function estimateEarnings(startCoin, middleCoin, investment, exchange, minimalOu
             return [estimatedGains, `${exchange}: ${startCoin} -- ${middleCoin} -- Estimated Gains are ${estimatedGains}\n`];
         }
     } catch(ex){
-
+        var g = true;
     }
     
     return -1;
 }
 
 async function main(){
-    await liveCoin.loadData();
-    await binance.loadData();
-    await exmo.loadData();
+    var load = [];
+
+    for(var exch of exchangeList){
+        switch(exch){
+            case "Livecoin":
+                load.push(liveCoin.loadData());
+                break;
+            case "Exmo":
+                load.push(exmo.loadData());
+                break;
+            case "Exx":
+                load.push(exx.loadData());
+                break;
+            case "Yobit":
+                load.push(yobit.loadData());
+                break;
+            case "Bitflip":
+                load.push(bitflip.loadData());
+                break;
+            case "Gate":
+                load.push(gate.loadData());
+                break;
+            case "Kucoin":
+                //load.push(liveCoin.loadData());
+                break;
+            case "Tidex":
+                load.push(tidex.loadData());
+                break;
+        }
+    }
+
+    for(var l of load){
+        await l;
+    }
 
     for(var i = 0; i < exchangeList.length; i++){
         highestBuyDiff[exchangeList[i]] = -1;
@@ -150,15 +231,17 @@ async function main(){
     
     var highestGains = [-1, ''];
 
-    for(var i = 0; i < cryptoList.length; i++){
-        var crypto1 = cryptoList[i];
-        for(var j = 0; j < cryptoList.length; j++){
-            var crypto2 = cryptoList[j];
+    for(var ex of exchangeList){
+        for(var i = 0; i < cryptoList.length; i++){
+            var crypto1 = cryptoList[i];
+            for(var j = 0; j < cryptoList.length; j++){
+                var crypto2 = cryptoList[j];
 
-            var gains2 = estimateEarnings(crypto1, crypto2, 500, "Exmo", true);
+                var gains = estimateEarnings(crypto1, crypto2, 500, ex, true);
 
-            if(gains2[0] > highestGains[0]){
-                highestGains = gains2;
+                if(gains[0] > highestGains[0]){
+                    highestGains = gains;
+                }
             }
         }
     }
@@ -168,61 +251,4 @@ async function main(){
 
 main();
 
-//const cryptoList = ["XRP", "WAVES", "DASH", "ZEC", "RDN", "KMD"];  
-
-//const cryptoList = ["XRP", "ZEC", "LTC", "DASH", "WAVES", "LSK", "KMD", "NEO", "EOS"];  
-const cryptoList = ["XRP", "ZEC", "LTC", "DASH", "ETC", "WAVES", "LSK", "WINGS", "KMD", "NEO", "EOS", "ICN", "MCO", "MTL"];  
-const exchangeList = ["Exmo", "LiveCoin"];
-
-var binanceWithdrawFees = {
-    "USDT": 28.5,
-    "ETH": 0.01,
-    "NEO": 0,
-    "XRP": 0.25,
-    "WAVES": 0.02,
-    "QTUM": 0.01,
-    "LTC": 0.01,
-    "EOS": 1,
-    "ZEC": 0.005,
-    "DASH": 0.002,
-    "ETC": 0.01,
-    "LSK": 0.1,
-    "XMR": 0.04,
-    "Wings": 10.1,
-    "KMD": 0.002,
-    "ICN": 4,
-    "MCO": 0.89,
-    "MTL": 2.6,
-    "RLC": 5.2
-};
-
-var exmoWithdrawFees = {
-    "USDT": 28.5,
-    "ETH": 0.01,
-    "XRP": 0.02,
-    "WAVES": 0.001,
-    "LTC": 0.01,
-    "ZEC": 0.001,
-    "DASH": 0.001,
-    "ETC": 0.01,
-    "XMR": 0.05
-};
-
-const liveCoinWithdrawFees = {
-    "USDT": 28.5,
-    "ETH": 0.01,
-    "NEO": 0,
-    "WAVES": 0.01,
-    "QTUM": 0.1,
-    "LTC": 0.01,
-    "EOS": 0.01,
-    "DASH": 0.002,
-    "LSK": 0.2,
-    "XMR": 0.03,
-    "Wings": 0.01,
-    "ICN": 1,
-    "MCO": 0.6,
-    "MTL": 2,
-    "RLC": 3
-}
 

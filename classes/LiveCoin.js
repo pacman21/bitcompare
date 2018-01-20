@@ -5,6 +5,23 @@ module.exports = class LiveCoin {
     
     constructor(){
         this.data;
+        this.withdrawFees = {
+            "USDT": 28.5,
+            "ETH": 0.01,
+            "NEO": 0,
+            "WAVES": 0.01,
+            "QTUM": 0.1,
+            "LTC": 0.01,
+            "EOS": 0.01,
+            "DASH": 0.002,
+            "LSK": 0.2,
+            "XMR": 0.03,
+            "Wings": 0.01,
+            "ICN": 1,
+            "MCO": 0.6,
+            "MTL": 2,
+            "RLC": 3
+        }
     }
 
     async loadData(){

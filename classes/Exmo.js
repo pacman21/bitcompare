@@ -5,10 +5,24 @@ module.exports = class Exmo {
 
     constructor(){
         this.data;
+        this.withdrawFees = {
+            "USDT": 28.5,
+            "ETH": 0.01,
+            "XRP": 0.02,
+            "WAVES": 0.001,
+            "LTC": 0.01,
+            "ZEC": 0.001,
+            "DASH": 0.001,
+            "ETC": 0.01,
+            "XMR": 0.05,
+            "BCH": 0.001
+        };
     }
+
     async loadData(){
         const response = await fetch("https://api.exmo.com/v1/ticker/");
         this.data = await response.json();
+        
         return this.data;
     }
 
@@ -41,4 +55,6 @@ module.exports = class Exmo {
             //console.log(error);
         }
     };
+
+
 };
