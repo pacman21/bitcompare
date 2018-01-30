@@ -4,6 +4,7 @@ const fetch = require("node-fetch");
 module.exports = class Tidex {
     
     constructor(cryptoList){
+        this.name = "Tidex";
         this.data;
         this.cryptoList = cryptoList;
 

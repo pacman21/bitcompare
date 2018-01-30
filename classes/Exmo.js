@@ -4,6 +4,7 @@ const fetch = require("node-fetch");
 module.exports = class Exmo {
 
     constructor(){
+        this.name = "Exmo";
         this.data;
         this.withdrawFees = {
             "USDT": 28.5,
@@ -26,19 +27,22 @@ module.exports = class Exmo {
         return this.data;
     }
 
-    getCoin(currency) {
+    getCoin(currency, inCurrency = "USD") {
         try {
+            inCurrency = inCurrency.toUpperCase();
+            var key = `${currency.toUpperCase()}_${inCurrency}`;
+
             var c = new Currency();
     
-            if(this.data[currency.toUpperCase() + "_USD"] != undefined){
-                var data = this.data[currency.toUpperCase() + "_USD"];
+            if(this.data[key] != undefined){
+                var data = this.data[key];
                 
                 c.buyPrice = data.buy_price;
                 c.sellPrice = data.sell_price;
                 c.currencyName = currency; 
     
                 return c;
-            } else {
+            } /*else {
                 var currInBtc = JSON.parse(JSON.stringify(this.data[currency.toUpperCase() + "_BTC"]));
                 var btcPrice = JSON.parse(JSON.stringify(this.data["BTC_USD"]));
     
@@ -50,7 +54,7 @@ module.exports = class Exmo {
                 c.currencyName = currency; 
     
                 return c;
-            } 
+            }*/ 
         } catch (error) {
             //console.log(error);
         }

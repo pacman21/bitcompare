@@ -4,6 +4,8 @@ const fetch = require("node-fetch");
 module.exports = class Bitflip {
     
     constructor(){
+        this.name = "Bitflip";
+        
         this.data;
 
         this.withdrawFees = {
@@ -41,7 +43,7 @@ module.exports = class Bitflip {
     getCoin(currency, inCurrency = "USD") {
         try {   
             var item = this.data.filter(function(item) {
-                return item.pair == `${currency.toUpperCase()}:${inCurrency}`;
+                return item.pair == `${currency.toUpperCase()}:${inCurrency.toUpperCase()}`;
             }); 
 
             if(item.length > 0){

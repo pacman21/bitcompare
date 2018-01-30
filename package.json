@@ -2,7 +2,7 @@
   "name": "bitcompare",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "anyExchangeCompare.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "node-fetch": "^1.7.3",
+    "prompt": "^1.0.0",
     "sleep": "^5.1.1"
   }
 }

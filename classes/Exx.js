@@ -4,6 +4,7 @@ const fetch = require("node-fetch");
 module.exports = class Exx {
     
     constructor(cryptoList){
+        this.name = "Exx";
         this.data;
 
         this.withdrawFees = {
@@ -40,14 +41,10 @@ module.exports = class Exx {
 
     getCoin(currency, inCurrency = "USDT") {
         try {   
+            var data = this.data[currency.toLowerCase() + "_" + inCurrency.toLowerCase()];
             //check if value exists in USDT
-            if(this.data[currency.toLowerCase() + "_usdt"] != undefined){
-                var data =  this.data[currency.toLowerCase() + "_usdt"];
-    
-                var c = new Currency(currency, data.sell, data.buy);
-                return c;
-            }
-    
+            var c = new Currency(currency, data.sell, data.buy);
+            return c;
         } catch (error) {
           //console.log(error);
         }

@@ -4,6 +4,7 @@ const fetch = require("node-fetch");
 module.exports = class Exx {
     
     constructor(cryptoList){
+        this.name = "Liqui";
         this.data;
         this.cryptoList = cryptoList;
 
@@ -36,8 +37,8 @@ module.exports = class Exx {
     async loadData(){
         var pairs = "";
         
-        for(var c in cryptoList){
-            pairs += cryptoList[c].toLowerCase() + "_usdt-";
+        for(var c in this.cryptoList){
+            pairs += this.cryptoList[c].toLowerCase() + "_usdt-";
         }
         
         const response = await fetch(`https://api.liqui.io/api/3/ticker/${pairs}?ignore_invalid=1`);
@@ -47,17 +48,14 @@ module.exports = class Exx {
 
     getCoin(currency, inCurrency = "usdt") {
         try {   
-            var currKey = `${currency.toLowerCase()}_${inCurrency}`;
-            //check if value exists in USDT
-            if(this.data[currKey] != undefined){
-                var data =  this.data[currKey];
-    
-                if(data.buy > 0 && data.sell > 0){
-                    var c = new Currency(currency, data.sell, data.buy);
-                    return c;
-                }
+            var currKey = `${currency.toLowerCase()}_${inCurrency.toLowerCase()}`;
+
+            var item =  this.data[currKey];
+
+            if(item.buy > 0 && item.sell > 0){
+                var c = new Currency(currency, item.sell, item.buy);
+                return c;
             }
-    
         } catch (error) {
           //console.log(error);
         }

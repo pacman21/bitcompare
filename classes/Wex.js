@@ -1,23 +1,21 @@
 const Currency = require("./Currency.js");
 const fetch = require("node-fetch");
 
-module.exports = class Yobit {
+module.exports = class Wex {
     
     constructor(cryptoList){
-        this.name = "Yobit";
+        this.name = "Wex";
         this.data;
-        this.cryptoList = cryptoList;
 
         this.withdrawFees = {
             "USDT": 28.5,
             "ETH": 0.01,
             "NEO": 0,
-            "XRP": 0.25,
             "WAVES": 0.02,
             "QTUM": 0.01,
             "LTC": 0.01,
             "EOS": 1,
-            "ZEC": 0.01,
+            "ZEC": 0.005,
             "DASH": 0.002,
             "ETC": 0.01,
             "LSK": 0.1,
@@ -29,13 +27,13 @@ module.exports = class Yobit {
             "MTL": 2.6,
             "RLC": 5.2,
             "BCH": 0.001,
-            "ADA": 1
         };
+        this.cryptoList = cryptoList;
     }
 
     async loadData(){
         var pairs = "";
-        
+    
         for(var c in this.cryptoList){
             pairs += this.cryptoList[c].toLowerCase() + "_usd-";
         }
@@ -43,16 +41,19 @@ module.exports = class Yobit {
         for(var c in this.cryptoList){
             pairs += this.cryptoList[c].toLowerCase() + "_eth-";
         }
+
+        for(var c in this.cryptoList){
+            pairs += this.cryptoList[c].toLowerCase() + "_btc-";
+        }
         
-        const response = await fetch(`https://yobit.net/api/3/ticker/${pairs}?ignore_invalid=1`);
+        const response = await fetch(`https://wex.nz/api/3/ticker/${pairs}?ignore_invalid=1`);
         this.data = await response.json();
         return this.data;
     }
 
     getCoin(currency, inCurrency = "usd") {
         try {   
-            var key = `${currency.toLowerCase()}_${inCurrency.toLowerCase()}`;
-
+            var key = `${currency.toLowerCase()}_${inCurrency.toLowerCase()}`
             //check if value exists in USDT
             if(this.data[key] != undefined){
                 var data =  this.data[key];
@@ -62,8 +63,8 @@ module.exports = class Yobit {
             }
     
         } catch (error) {
-            var g = true;
-            //console.log(error);
+          //console.log(error);
         }
-    }
+    };
+    
 };

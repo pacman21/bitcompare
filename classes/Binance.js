@@ -4,7 +4,10 @@ const fetch = require("node-fetch");
 module.exports = class Binance{
 
     constructor(){
+        this.name = "Binance";
+        
         this.data;
+
         this.withdrawFees = {
             "USDT": 28.5,
             "ETH": 0.01,
@@ -41,8 +44,10 @@ module.exports = class Binance{
 
     getCoin(outCurrency, inCurrency = "USDT") {
         try {  
+            var outCurrency = outCurrency.toUpperCase();
             var tradeOutcurrency = outCurrency;
-            if(outCurrency == "USDT"){
+
+            if(outCurrency.toUpperCase() == "USDT"){
                 return 1;
             }     
 
@@ -52,7 +57,7 @@ module.exports = class Binance{
 
             //check if value exists in USDT
             var item = this.data.filter(function(item) {
-                return item.symbol == tradeOutcurrency.toUpperCase() + inCurrency;
+                return item.symbol == tradeOutcurrency.toUpperCase() + inCurrency.toUpperCase();
             }); 
 
             if(item.length > 0){
@@ -60,7 +65,9 @@ module.exports = class Binance{
 
                 var c = new Currency(outCurrency, data, data);
                 return c;
-            } else {
+            } 
+            
+            if(inCurrency == "USDT") {
                 var etherItem = this.data.filter(function(item) {
                     return item.symbol == "ETHUSDT";
                 });      

@@ -4,6 +4,7 @@ const fetch = require("node-fetch");
 module.exports = class LiveCoin {
     
     constructor(){
+        this.name = "LiveCoin";
         this.data;
         this.withdrawFees = {
             "USDT": 28.5,
@@ -32,15 +33,19 @@ module.exports = class LiveCoin {
 
     getCoin(currency, inCurrency = "USD") {
         try {
+            if(currency == "BCC"){
+                return;
+            }
+
             var item = this.data.filter(function(item) {
-                return item.symbol == currency.toUpperCase() + `/${inCurrency}`;
+                return item.symbol == currency.toUpperCase() + `/${inCurrency.toUpperCase()}`;
             }); 
     
             if(item.length > 0){
                 var data = item[0]; 
                 var c = new Currency(currency, data.best_ask, data.best_bid);
                 return c;
-            } else {
+            } /*else {
                 var currInBtc = this.data.filter(function(item) {
                     return item.symbol == currency.toUpperCase() + "/BTC";
                 }); 
@@ -58,7 +63,8 @@ module.exports = class LiveCoin {
                 var c = new Currency(currency, btcCurr.best_ask, btcCurr.best_bid);
                 
                 return c;
-            }        
+            }   */
+
         } catch (error) {
           var g = true;
         }

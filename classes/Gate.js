@@ -4,6 +4,7 @@ const fetch = require("node-fetch");
 module.exports = class Gate {
     
     constructor(){
+        this.name = "Gate";
         this.data;
 
         this.withdrawFees = {
@@ -36,17 +37,19 @@ module.exports = class Gate {
     }
 
     getCoin(currency, inCurrency = "USDT") {
+        if(currency == "XRP" || currency == "WAVES"){
+            return null;
+        }
+
         try {   
             //check if value exists in USDT
-            if(this.data[currency.toLowerCase() + "_usdt"] != undefined){
-                var data =  this.data[currency.toLowerCase() + "_usdt"];
+            var data = this.data[`${currency.toLowerCase()}_${inCurrency.toLowerCase()}`];
     
-                var c = new Currency(currency, data.lowestAsk, data.highestBid);
-                return c;
-            }
+            var c = new Currency(currency, data.lowestAsk, data.highestBid);
+            return c;
     
         } catch (error) {
-          //console.log(error);
+            var g= true;
         }
     };
     
