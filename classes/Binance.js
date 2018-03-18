@@ -21,6 +21,7 @@ module.exports = class Binance{
             "DASH": 0.002,
             "ETC": 0.01,
             "LSK": 0.1,
+            "XLM": 0.5,
             "XMR": 0.04,
             "Wings": 10.1,
             "KMD": 0.002,

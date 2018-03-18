@@ -8,11 +8,12 @@ const Yobit = require('./classes/Yobit.js');
 const Exx = require('./classes/Exx.js');
 const Bitflip = require('./classes/Bitflip.js');
 const Wex = require('./classes/Wex.js');
+const Cex = require('./classes/Cex.js');
 const Liqui = require('./classes/Liqui.js');
 var fs = require('fs');
 var sleep = require('sleep');
 
-const cryptoList = ["XRP", "WAVES", "DASH", "RDN", "KMD", "BCH", "ETC", "LTC", "QTUM", "BCC", "XVG", "ZEC", "XMR"];  
+const cryptoList = ["XRP", "NEO", "DASH", "RDN", "KMD", "BCH", "ETC", "LTC", "QTUM", "BCC", "XVG", "ZEC", "XMR", "XLM"];  
 //const cryptoList = ["XRP", "ZEC", "LTC", "DASH", "WAVES", "LSK", "KMD", "NEO", "EOS"];  
 //const cryptoList = ["XRP", "ZEC", "LTC", "DASH", "ETC", "WAVES", "LSK", "WINGS", "KMD", "EOS", "ICN", "MCO", "MTL"];  
 //const exchangeList = ["Exmo", "LiveCoin", "Exx", "Yobit", "Bitflip", "Gate"];
@@ -31,8 +32,9 @@ var exx = new Exx();
 var bitflip = new Bitflip();
 var wex = new Wex(cryptoList);
 var liqui = new Liqui(cryptoList);
+var cex = new Cex();
 
-const exchangeList = [exmo, liveCoin, exx, wex, liqui];
+const exchangeList = [exmo, yobit, tidex, exx, wex, liqui, cex];
 
 function compare(coin){
     var binanceCurr = 1;

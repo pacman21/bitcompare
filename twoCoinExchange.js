@@ -7,12 +7,13 @@ const Tidex = require('./classes/Tidex.js');
 const Yobit = require('./classes/Yobit.js');
 const Exx = require('./classes/Exx.js');
 const Bitflip = require('./classes/Bitflip.js');
+const Cex = require('./classes/Cex.js');
 const Wex = require('./classes/Wex.js');
 var fs = require('fs');
 var sleep = require('sleep');
 
 const homeCoin = "eth";
-const cryptoList = ["XRP", "WAVES", "DASH", "RDN", "KMD", "BCH", "ETC", "LTC", "QTUM", "BCC", "XVG", "zec", "trx", "xvg", "storj", "mco", "lsk", "eos", "bcc"];  
+const cryptoList = ["XRP", "WAVES", "DASH", "RDN", "NEO", "XLM", "KMD", "BCH", "ETC", "LTC", "QTUM", "BCC", "XVG", "zec", "trx", "xvg", "storj", "mco", "lsk", "eos", "bcc"];  
 
 var binance = new Binance();
 var exmo = new Exmo();
@@ -22,9 +23,10 @@ var gate = new Gate();
 var yobit = new Yobit(cryptoList);
 var exx = new Exx();
 var bitflip = new Bitflip();
+var cex = new Cex();
 var wex = new Wex(cryptoList);
 
-const exchangeList = [exmo, liveCoin, exx, gate, wex, tidex];
+const exchangeList = [exmo, liveCoin, exx, gate, wex, tidex, cex];
 
 function oneWayCompare(){
     var best = 0;
@@ -35,20 +37,20 @@ function oneWayCompare(){
         console.log(`Coin: ${coin}`);
         for(var exchange of exchangeList){
             try {
-                var homeCoinStart = 1;
+                var homeCoinStart = 0.5;
                 var homeCoinWithdraw = 0.01;
                 var exchangeCoinWithdraw = exchange.withdrawFees[coin];
                 var exchangeCoin = exchange.getCoin(coin, homeCoin);
                 
-                var pctDiff = (binanceCoin.buyPrice - exchangeCoin.sellPrice) / binanceCoin.buyPrice;
+                var pctDiff = (binanceCoin.buyPrice - exchangeCoin.buyPrice) / binanceCoin.buyPrice;
                 
                 var buyCoin = (homeCoinStart / binanceCoin.buyPrice);
                 buyCoin = buyCoin - exchangeCoinWithdraw;
-                var sellCoin = (exchangeCoin.sellPrice * buyCoin);
+                var sellCoin = (exchangeCoin.buyPrice * buyCoin);
                 //sellCoin = sellCoin - homeCoinWithdraw;
 
                 var realPctDiff = (sellCoin - homeCoinStart) / homeCoinStart;
-                var output = `Coin: ${coin}  --- Exchange: ${exchange.name} --- Percent Diff: ${realPctDiff} -- Coin Count: ${sellCoin}`;
+                var output = `Coin: ${coin}  --- Exchange: ${exchange.name} / ${exchangeCoin.buyPrice} --- Percent Diff: ${realPctDiff} -- Coin Count: ${sellCoin}`;
                 
                 if(sellCoin > homeCoinStart){
                     bestLog = output;
